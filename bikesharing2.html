@@ -1,0 +1,338 @@
+<html>
+<head>
+<title>Bikesharing1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+</head>
+<style>
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis .title {
+  font-weight: bold;
+  text-anchor: end;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+.dot {
+	stroke: transparent;
+	stroke-width: 10px;  
+	cursor: pointer;
+}
+ 
+.dot:hover {
+	stroke: rgba(68, 127, 255, 0.3);
+}
+
+</style>
+<body>
+
+	<script>
+
+		var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+		width= 960 - margin.left - margin.right,
+		height = 500 - margin.top - margin.bottom;
+
+		var x = d3.time.scale()
+			.domain([1433850039000, 1433950801000])
+			.range([0, width]);
+
+		var y = d3.scale.linear()
+			.domain([0, 60])
+			.range([height, 0]);
+
+		var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
+
+		var yAxis= d3.svg.axis()
+				.scale(y)
+				.orient("left");
+
+		var line = d3.svg.line()
+				.interpolate("linear")
+				.x(function(d) { return x(d.timestamp); })
+				.y(function(d) { return y(d.value); });
+
+		var zoom = d3.behavior.zoom()
+		    		.x(x)
+		    		.scaleExtent([1, 1000])
+		    		.on("zoom", zoomed);
+
+		var canvas = d3.select("body")
+				.append("svg")
+				.call(zoom)
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		canvas.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis);
+
+		canvas.append("g")
+			.attr("class", "y axis")
+			.call(yAxis)
+			.append("text")
+			.attr("class", "title")
+			.attr("transform", "rotate(-90)")
+			.attr("y", 6)
+			.attr("dy", ".71em")
+			.text("Value");
+
+		var pointsblack;
+		var pointsred;
+		var pointsgreen;
+		var pointslime;
+		var pointsorange;
+		var pointsteelblue;
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation2&name=number%20available&seconds=604800", function(data){
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "black")
+				.attr("d", line);
+
+			pointsblack = canvas.selectAll(".dotsblack")
+				.data(data)
+				.enter()
+				.append("g")
+			.	attr("class", "dotsblack")
+
+
+				pointsblack.selectAll(".dot")
+				.data(function(d, index){
+					var a = [];
+					a.push({'index': index, 'point': d});				
+					return a})
+				.enter()
+				.append("circle")
+				.attr("class", "dot")
+				.attr("stroke", "black")
+				.attr("fill", "black")
+				.attr("r", "2.5")
+				.attr("transform", function(d) {
+					return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+				);
+		});
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation2&name=city%20bike%20adult%20without%20gears&seconds=604800", function(data){
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "red")
+				.attr("d", line);
+
+			pointsred = canvas.selectAll(".dotsred")
+				.data(data)
+				.enter()
+				.append("g")
+			.	attr("class", "dotsred")
+
+
+				pointsred.selectAll(".dot")
+				.data(function(d, index){
+					var a = [];
+					a.push({'index': index, 'point': d});				
+					return a})
+				.enter()
+				.append("circle")
+				.attr("class", "dot")
+				.attr("stroke", "red")
+				.attr("fill", "red")
+				.attr("r", "2.5")
+				.attr("transform", function(d) {
+					return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+				);
+
+		});
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation2&name=mountain%20bike%20child&seconds=604800", function(data){
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "lime")
+				.attr("d", line);
+
+			pointslime = canvas.selectAll(".dotslime")
+				.data(data)
+				.enter()
+				.append("g")
+			.	attr("class", "dotslime")
+
+
+				pointslime.selectAll(".dot")
+				.data(function(d, index){
+					var a = [];
+					a.push({'index': index, 'point': d});				
+					return a})
+				.enter()
+				.append("circle")
+				.attr("class", "dot")
+				.attr("stroke", "lime")
+				.attr("fill", "lime")
+				.attr("r", "2.5")
+				.attr("transform", function(d) {
+					return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+				);
+
+		});
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation2&name=mountain%20bike%20teenager&seconds=604800", function(data){
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "steelblue")
+				.attr("d", line);
+
+			pointsteelblue = canvas.selectAll(".dotssteelblue")
+				.data(data)
+				.enter()
+				.append("g")
+			.	attr("class", "dotssteelblue")
+
+
+				pointsteelblue.selectAll(".dot")
+				.data(function(d, index){
+					var a = [];
+					a.push({'index': index, 'point': d});				
+					return a})
+				.enter()
+				.append("circle")
+				.attr("class", "dot")
+				.attr("stroke", "steelblue")
+				.attr("fill", "steelblue")
+				.attr("r", "2.5")
+				.attr("transform", function(d) {
+					return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+				);
+		});
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation2&name=mountain%20bike%20adult&seconds=604800", function(data){
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "orange")
+				.attr("d", line);
+
+			pointsorange = canvas.selectAll(".dotsorange")
+				.data(data)
+				.enter()
+				.append("g")
+			.	attr("class", "dotsorange")
+
+
+				pointsorange.selectAll(".dot")
+				.data(function(d, index){
+					var a = [];
+					a.push({'index': index, 'point': d});				
+					return a})
+				.enter()
+				.append("circle")
+				.attr("class", "dot")
+				.attr("stroke", "orange")
+				.attr("fill", "orange")
+				.attr("r", "2.5")
+				.attr("transform", function(d) {
+					return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+				);
+		});
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation2&name=city%20bike%20adult%20with%20gears&seconds=604800", function(data){
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "green")
+				.attr("d", line);
+
+			pointsgreen = canvas.selectAll(".dotsgreen")
+				.data(data)
+				.enter()
+				.append("g")
+			.	attr("class", "dotsgreen")
+
+
+				pointsgreen.selectAll(".dot")
+				.data(function(d, index){
+					var a = [];
+					a.push({'index': index, 'point': d});				
+					return a})
+				.enter()
+				.append("circle")
+				.attr("class", "dot")
+				.attr("stroke", "green")
+				.attr("fill", "green")
+				.attr("r", "2.5")
+				.attr("transform", function(d) {
+					return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+				);
+		});
+
+		function zoomed() {
+			canvas.select(".x.axis").call(xAxis);   
+			canvas.selectAll('path.line').attr('d', line); 
+
+			pointsblack.selectAll('circle').attr("transform", function(d) { 
+				return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+			);
+
+			pointsred.selectAll('circle').attr("transform", function(d) { 
+				return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+			);
+
+			pointsgreen.selectAll('circle').attr("transform", function(d) { 
+				return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+			);
+
+			pointslime.selectAll('circle').attr("transform", function(d) { 
+				return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+			);
+
+			pointsorange.selectAll('circle').attr("transform", function(d) { 
+				return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+			);
+
+			pointsteelblue.selectAll('circle').attr("transform", function(d) { 
+				return "translate(" + x(d.point.timestamp) + "," + y(d.point.value) + ")"; }
+			);
+		}
+
+
+	</script>
+<ul>
+<li><button style="background-color:black; border: none; height: 3px; align:center"></button> Number of Available</li>
+<li><button style="background-color:red; border: none; height: 3px; align:center"></button> City Bike adult without gears</li>
+<li><button style="background-color:green; border: none; height: 3px; align:center"></button> City Bike adult with gears</li>
+<li><button style="background-color:lime; border: none; height: 3px; align:center"></button> Mountain Bike Child</li>
+<li><button style="background-color:steelblue; border: none; height: 3px; align:center"></button> Mountain Bike Teenager</li>
+<li><button style="background-color:orange; border: none; height: 3px; align:center"></button> Mountain Bike Adult</li>
+</ul>
+
+<a href="bikesharing1.html">Station 1</a>
+</body>
+</html>
