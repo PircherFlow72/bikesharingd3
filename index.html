@@ -30,6 +30,16 @@
   stroke-width: 1.5px;
 }
 
+.dot {
+	stroke: transparent;
+	stroke-width: 10px;  
+	cursor: pointer;
+}
+ 
+.dot:hover {
+	stroke: rgba(68, 127, 255, 0.3);
+}
+
 </style>
 <body>
 
@@ -56,11 +66,18 @@
 				.orient("left");
 
 		var line = d3.svg.line()
+				.interpolate("linear")
 				.x(function(d) { return x(d.timestamp); })
 				.y(function(d) { return y(d.value); });
 
+		var zoom = d3.behavior.zoom()
+		    		.x(x)
+		    		.scaleExtent([1, 1000])
+		    		.on("zoom", zoomed);
+
 		var canvas = d3.select("body")
 				.append("svg")
+				.call(zoom)
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
@@ -81,67 +98,78 @@
 			.attr("dy", ".71em")
 			.text("Value");
 
+		canvas.append("clipPath")
+			.attr("id", "clip")
+			.append("rect")
+			.attr("width", width)
+			.attr("height", height);
+
 
 		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=number%20available&seconds=1814400", function(data){
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
 
 			canvas.append("path")
 				.datum(data)
 				.attr("class", "line")
 				.attr("stroke", "black")
+				.attr("cli-path", "url('clip)")
 				.attr("d", line);
+
 		});
 
 		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=city%20bike%20adult%20without%20gears&seconds=1814400", function(data){
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
 
 			canvas.append("path")
 				.datum(data)
 				.attr("class", "line")
 				.attr("stroke", "red")
+				.attr("cli-path", "url('clip)")
 				.attr("d", line);
 		});
 
-d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20child&seconds=1814400", function(data){
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20child&seconds=1814400", function(data){
 
 			canvas.append("path")
 				.datum(data)
 				.attr("class", "line")
 				.attr("stroke", "lime")
+				.attr("cli-path", "url('clip)")
 				.attr("d", line);
 		});
 
-d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20teenager&seconds=1814400", function(data){
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20teenager&seconds=1814400", function(data){
 
 			canvas.append("path")
 				.datum(data)
 				.attr("class", "line")
 				.attr("stroke", "steelblue")
+				.attr("cli-path", "url('clip)")
 				.attr("d", line);
 		});
 
-d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20adult&seconds=1814400", function(data){
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20adult&seconds=1814400", function(data){
 
 			canvas.append("path")
 				.datum(data)
 				.attr("class", "line")
 				.attr("stroke", "orange")
+				.attr("cli-path", "url('clip)")
 				.attr("d", line);
 		});
 
-d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=city%20bike%20adult%20with%20gears&seconds=1814400", function(data){
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=city%20bike%20adult%20with%20gears&seconds=1814400", function(data){
 
 			canvas.append("path")
 				.datum(data)
 				.attr("class", "line")
 				.attr("stroke", "green")
+				.attr("cli-path", "url('clip)")
 				.attr("d", line);
 		});
+
+		function zoomed() {
+			canvas.select(".x.axis").call(xAxis);   
+			canvas.selectAll('path.line').attr('d', line);  
+		}
 
 
 	</script>
