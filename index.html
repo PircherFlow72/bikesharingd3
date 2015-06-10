@@ -3,46 +3,155 @@
 <title>D3 Test</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
 </head>
+<style>
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis .title {
+  font-weight: bold;
+  text-anchor: end;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+</style>
 <body>
 
 	<script>
 
-		var dataArray = [5, 70, 45, 25];
-		var width=500;
-		var height=500;
+		var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+		width= 960 - margin.left - margin.right,
+		height = 500 - margin.top - margin.bottom;
 
-		var widthScale = d3.scale.linear()
-					.domain([0,70])
-					.range([0,width]);
+		var x = d3.time.scale()
+			.domain([1432121700000, 1433935800000])
+			.range([0, width]);
 
-		var colorScale = d3.scale.linear()
-					.domain([0,70])
-					.range(["green", "red"]);
+		var y = d3.scale.linear()
+			.domain([0, 60])
+			.range([height, 0]);
 
-		var axis = d3.svg.axis()
-				.scale(widthScale);
+		var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
+
+		var yAxis= d3.svg.axis()
+				.scale(y)
+				.orient("left");
+
+		var line = d3.svg.line()
+				.x(function(d) { return x(d.timestamp); })
+				.y(function(d) { return y(d.value); });
 
 		var canvas = d3.select("body")
 				.append("svg")
-				.attr("width", width)
-				.attr("height", height)
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
-				.attr("transform", "translate(20, 0)");
-
-		var bars = canvas.selectAll("rect")
-				.data(dataArray)
-				.enter()
-					.append("rect")
-					.attr("width", function(d) { return widthScale(d); })
-					.attr("height", 50)
-					.attr("fill", function(d) { return colorScale(d); })
-					.attr("y", function(d, i) { return i * 100; });
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 		canvas.append("g")
-			.attr("transform", "translate(0, 400)")
-			.call(axis);
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis);
+
+		canvas.append("g")
+			.attr("class", "y axis")
+			.call(yAxis)
+			.append("text")
+			.attr("class", "title")
+			.attr("transform", "rotate(-90)")
+			.attr("y", 6)
+			.attr("dy", ".71em")
+			.text("Value");
+
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=number%20available&seconds=1814400", function(data){
+			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "black")
+				.attr("d", line);
+		});
+
+		d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=city%20bike%20adult%20without%20gears&seconds=1814400", function(data){
+			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "red")
+				.attr("d", line);
+		});
+
+d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20child&seconds=1814400", function(data){
+			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "lime")
+				.attr("d", line);
+		});
+
+d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20teenager&seconds=1814400", function(data){
+			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "steelblue")
+				.attr("d", line);
+		});
+
+d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=mountain%20bike%20adult&seconds=1814400", function(data){
+			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "orange")
+				.attr("d", line);
+		});
+
+d3.json("http://ipchannels.integreen-life.bz.it/bikesharingFrontEnd/rest/get-records?station=bikestation1&name=city%20bike%20adult%20with%20gears&seconds=1814400", function(data){
+			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+
+
+			canvas.append("path")
+				.datum(data)
+				.attr("class", "line")
+				.attr("stroke", "green")
+				.attr("d", line);
+		});
+
 
 	</script>
-
+<ul>
+<li><button style="background-color:black; border: none; height: 3px; align:center"></button> Number of Available</li>
+<li><button style="background-color:red; border: none; height: 3px; align:center"></button> City Bike adult without gears</li>
+<li><button style="background-color:green; border: none; height: 3px; align:center"></button> City Bike adult with gears</li>
+<li><button style="background-color:lime; border: none; height: 3px; align:center"></button> Mountain Bike Child</li>
+<li><button style="background-color:steelblue; border: none; height: 3px; align:center"></button> Mountain Bike Teenager</li>
+<li><button style="background-color:orange; border: none; height: 3px; align:center"></button> Mountain Bike Adult</li>
+</ul>
 </body>
 </html>
